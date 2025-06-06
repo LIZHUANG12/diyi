@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中文小说错字游戏</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+        .game-area {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .text-content {
+            font-size: 1.2em;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+        .typo {
+            background: #ff6b6b;
+            padding: 2px 4px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .typo:hover {
+            background: #ff5252;
+            transform: scale(1.1);
+        }
+        .correct {
+            background: #4ecdc4;
+            animation: flash 0.5s ease;
+        }
+        @keyframes flash {
+            0% { background: #4ecdc4; }
+            50% { background: #26a69a; }
+            100% { background: #4ecdc4; }
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .btn {
+            background: #4ecdc4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s ease;
+        }
+        .btn:hover {
+            background: #26a69a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 中文小说错字游戏</h1>
+        
+        <div class="game-area">
+            <h3>第一章：红楼梦</h3>
+            <div class="text-content" id="gameText">
+                点击下面的错字来纠正它们：<br><br>
+                
+                "这<span class="typo" data-correct="个">各</span>林黛玉常听得母亲说过，他外祖母家与别<span class="typo" data-correct="家">个</span>不同。他近日所见的这几个三等仆妇，吃<span class="typo" data-correct="穿">床</span>用度，已是不凡了，何况今至其家。因此步步留心，时时在意，不肯轻易多说一句话，多行一步<span class="typo" data-correct="路">陆</span>，惟恐被人耻笑了他去。"
+            </div>
+            
+            <div class="stats">
+                <div>找到错字: <span id="found">0</span>/4</div>
+                <div>积分: <span id="score">0</span></div>
+                <div>时间: <span id="timer">0</span>秒</div>
+            </div>
+            
+            <button class="btn" onclick="resetGame()">重新开始</button>
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px; opacity: 0.8;">
+            <p>找出文本中的错字，点击即可纠正并获得积分！</p>
+        </div>
+    </div>
+
+    <script>
+        let found = 0;
+        let score = 0;
+        let startTime = Date.now();
+        let timer;
+
+        function updateTimer() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            document.getElementById('timer').textContent = elapsed;
+        }
+
+        function initGame() {
+            timer = setInterval(updateTimer, 1000);
+            
+            document.querySelectorAll('.typo').forEach(typo => {
+                typo.addEventListener('click', function() {
+                    if (!this.classList.contains('correct')) {
+                        this.textContent = this.dataset.correct;
+                        this.classList.add('correct');
+                        this.classList.remove('typo');
+                        
+                        found++;
+                        score += 10;
+                        
+                        document.getElementById('found').textContent = found;
+                        document.getElementById('score').textContent = score;
+                        
+                        if (found === 4) {
+                            clearInterval(timer);
+                            setTimeout(() => {
+                                alert('恭喜完成！总积分: ' + score);
+                            }, 500);
+                        }
+                    }
+                });
+            });
+        }
+
+        function resetGame() {
+            found = 0;
+            score = 0;
+            startTime = Date.now();
+            
+            document.getElementById('found').textContent = found;
+            document.getElementById('score').textContent = score;
+            document.getElementById('timer').textContent = 0;
+            
+            clearInterval(timer);
+            
+            document.querySelectorAll('.correct').forEach(el => {
+                el.classList.remove('correct');
+                el.classList.add('typo');
+                if (el.dataset.correct === '个') el.textContent = '各';
+                if (el.dataset.correct === '家') el.textContent = '个';
+                if (el.dataset.correct === '穿') el.textContent = '床';
+                if (el.dataset.correct === '路') el.textContent = '陆';
+            });
+            
+            initGame();
+        }
+
+        // 初始化游戏
+        initGame();
+    </script>
+</body>
+</html>
